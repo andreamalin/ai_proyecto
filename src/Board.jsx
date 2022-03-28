@@ -121,19 +121,27 @@ const Board = ({ width, height }) => {
   const moveSnake = (event) => {
     switch (event.keyCode) {
       case RIGHT: {
-        updateSnake(RIGHT)
+        if (lastKey !== LEFT) {
+          updateSnake(RIGHT)
+        }
         break
       }
       case UP: {
-        updateSnake(UP)
+        if (lastKey !== DOWN) {
+          updateSnake(UP)
+        }
         break
       }
       case LEFT: {
-        updateSnake(LEFT)
+        if (lastKey !== RIGHT) {
+          updateSnake(LEFT)
+        }
         break
       }
       case DOWN: {
-        updateSnake(DOWN)
+        if (lastKey !== UP) {
+          updateSnake(DOWN)
+        }
         break
       }
       default:
@@ -142,6 +150,7 @@ const Board = ({ width, height }) => {
   }
 
   useEffect(() => {
+    // New empty board
     const x = new Array(height)
 
     for (let i = 0; i < x.length; i += 1) {
@@ -152,7 +161,7 @@ const Board = ({ width, height }) => {
       x[item.y][item.x] = 1 // 1->Snake
     })
 
-    x[food.y][food.x] = 2
+    x[food.y][food.x] = 2 // 2->Snake
 
     setBoard(x)
   }, [snake])
