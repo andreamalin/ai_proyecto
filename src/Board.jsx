@@ -81,6 +81,22 @@ const Board = ({ width, height }) => {
   }
 
   /**
+   * Function to check if new head is toching the snake body
+   * @param newHead newHead position
+   * @param snakeBody snake body position
+   */
+  const checkDeath = (newHead, snakeBody) => {
+    snakeBody.map((cell) => {
+      if (newHead.x === cell.x && newHead.y === cell.y) {
+        // eslint-disable-next-line no-alert
+        alert('you are dead')
+      }
+      return cell
+    })
+    snake.push(newHead) // Update snake with new head
+  }
+
+  /**
    * Function to change snake current position
    * @param key -> key keyCode
    */
@@ -110,7 +126,7 @@ const Board = ({ width, height }) => {
         break
     }
 
-    snake.push(head) // Update snake with new head
+    checkDeath(head, snake) // check if snake is toching the body
 
     checkFood(head) // Check if new head is touching food
     setLastKey(key) // Save last keydown
