@@ -39,21 +39,25 @@ const Board = ({ width, height }) => {
         x: 2,
         y: initialPos,
         isHead: false,
+        direction: 'right',
       },
       {
         x: 3,
         y: initialPos,
         isHead: false,
+        direction: 'right',
       },
       {
         x: 4,
         y: initialPos,
         isHead: false,
+        direction: 'right',
       },
       {
         x: 5,
         y: initialPos,
         isHead: true,
+        direction: 'right',
       },
     ])
     // Set complete board
@@ -70,10 +74,28 @@ const Board = ({ width, height }) => {
       // Get tail
       const tail = { ...snake[0] }
       // Add a new value at the first position of the snake (new tail)
+      let xMove
+      let yMove
+      if (tail.direction === 'right') {
+        xMove = tail.x - 1
+      } else if (tail.direction === 'left') {
+        xMove = tail.x + 1
+      } else {
+        xMove = tail.x
+      }
+
+      if (tail.direction === 'up') {
+        yMove = tail.y + 1
+      } else if (tail.direction === 'down') {
+        yMove = tail.y - 1
+      } else {
+        yMove = tail.y
+      }
       snake.unshift({
-        x: tail.x + 1,
-        y: tail.y,
+        x: xMove,
+        y: yMove,
         isHead: false,
+        direction: tail.direction,
       })
       // Set food in new coordinates
       setFood({ x: 0, y: 0 })
@@ -112,15 +134,19 @@ const Board = ({ width, height }) => {
     switch (key) {
       case RIGHT:
         head.x += 1
+        head.direction = 'right'
         break
       case LEFT:
         head.x -= 1
+        head.direction = 'left'
         break
       case UP:
         head.y -= 1
+        head.direction = 'up'
         break
       case DOWN:
         head.y += 1
+        head.direction = 'down'
         break
       default:
         break
