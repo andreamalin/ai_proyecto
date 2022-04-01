@@ -119,6 +119,34 @@ const Board = ({ width, height }) => {
   }
 
   /**
+   * Function to check if the border was touched
+   * @param key direction pressed
+   * @param head current head
+   */
+  const checkBorder = (key, head) => {
+    switch (key) {
+      case RIGHT:
+        // eslint-disable-next-line no-alert
+        if (head.x + 1 >= board[0].length) alert('You lost')
+        break
+      case LEFT:
+        // eslint-disable-next-line no-alert
+        if (head.x - 1 < 0) alert('You lost')
+        break
+      case UP:
+        // eslint-disable-next-line no-alert
+        if (head.y - 1 < 0) alert('You lost')
+        break
+      case DOWN:
+        // eslint-disable-next-line no-alert
+        if (head.y + 1 >= board.length) alert('You lost')
+        break
+      default:
+        break
+    }
+  }
+
+  /**
    * Function to change snake current position
    * @param key -> key keyCode
    */
@@ -130,6 +158,8 @@ const Board = ({ width, height }) => {
     // Get new head
     const head = { ...snake[snake.length - 1] }
     head.isHead = true
+
+    checkBorder(key, head)
     // Depending the key update coordinate of new head
     switch (key) {
       case RIGHT:
