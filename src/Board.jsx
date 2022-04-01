@@ -98,7 +98,23 @@ const Board = ({ width, height }) => {
         direction: tail.direction,
       })
       // Set food in new coordinates
-      setFood({ x: 0, y: 0 })
+      let isSet = false
+      while (!isSet) {
+        const xVal = Math.floor(Math.random() * board[0].length)
+        const yVal = Math.floor(Math.random() * board.length)
+        const inSnake = []
+        snake.forEach((square, index) => {
+          if (square.x === xVal && square.y === yVal) {
+            inSnake[index] = true
+          } else {
+            inSnake[index] = false
+          }
+        })
+        if (!inSnake.includes(true)) {
+          isSet = true
+          setFood({ x: xVal, y: yVal })
+        }
+      }
     }
   }
 
