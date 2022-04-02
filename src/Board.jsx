@@ -4,6 +4,8 @@
 /* eslint-disable react/no-array-index-key */
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import bfs from './ai/bfs'
+import sleep from './utils/others'
 import './index.scss'
 
 const LEFT = 37
@@ -253,6 +255,31 @@ const Board = ({ width, height }) => {
 
     setBoard(x)
   }, [snake])
+
+  useEffect(() => {
+    const nextMove = bfs(board, snake, food)
+    if (nextMove === -1) return
+    const head = snake.slice(-1)[0]
+    let action = -1
+
+    // Gets the move key
+    if (nextMove.x - head.x < 0) { // right
+      action = LEFT
+    } else if (nextMove.x - head.x > 0) { // left
+      action = RIGHT
+    } else if (nextMove.y - head.y < 0) { // up
+      action = UP
+    } else if (nextMove.y - head.y > 0) { // down
+      action = DOWN
+    }
+
+    if (action === -1) return
+    sleep(500).then(() => {
+      moveSnake({
+        keyCode: action,
+      })
+    })
+  }, [board])
 
   return (
     <div className="board" onKeyDown={moveSnake} tabIndex="0">
