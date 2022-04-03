@@ -1,3 +1,14 @@
+.button{
+    cursor: pointer;
+    background: transparent;
+    border: transparent;
+    max-width: 4vw;
+    padding: 0;
+    img{
+        max-width: 4vw;
+    }
+}
+
 .board {
     display: flex;
     flex-direction: column;
