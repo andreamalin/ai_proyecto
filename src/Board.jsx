@@ -235,7 +235,8 @@ const Board = ({ width, height }) => {
         break
       }
       default:
-        break
+        // eslint-disable-next-line no-alert
+        alert('stopped')
     }
   }
 
@@ -274,12 +275,12 @@ const Board = ({ width, height }) => {
     }
 
     if (action === -1) return
-    sleep(500).then(() => {
+    sleep(100).then(() => {
       moveSnake({
         keyCode: action,
       })
     })
-  }, [board])
+  }, [snake])
 
   return (
     <div className="board" onKeyDown={moveSnake} tabIndex="0">
