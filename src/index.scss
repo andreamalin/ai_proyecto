@@ -42,3 +42,24 @@
         border-radius: 100%;
     }
 }
+
+.modal-container{
+    background: linear-gradient(48deg, rgba(93,200,240,1) 0%, rgba(111,123,210,1) 50%, rgba(93,200,255,1) 100%);
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+
+    .modal{
+        background-color: white;
+        max-width: 100%;
+        margin-bottom: 10vh;
+        padding: 30px 50px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0.2);
+        text-align: center;
+    }
+}

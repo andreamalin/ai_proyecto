@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import bfs from './ai/bfs'
 import sleep from './utils/others'
+import Modal from './modal'
 import './index.scss'
 
 const LEFT = 37
@@ -18,6 +19,7 @@ const Board = ({ width, height }) => {
   const [snake, setSnake] = useState([])
   const [food, setFood] = useState({ x: 0, y: 0 })
   const [lastKey, setLastKey] = useState()
+  const [hasLost, setHasLost] = useState(false)
 
   // Fill new board
   useEffect(() => {
@@ -128,8 +130,9 @@ const Board = ({ width, height }) => {
   const checkDeath = (newHead, snakeBody) => {
     snakeBody.map((cell) => {
       if (newHead.x === cell.x && newHead.y === cell.y) {
-        // eslint-disable-next-line no-alert
-        alert('you are dead')
+        setHasLost(true)
+        // eslint-disable-next-line no-console
+        console.log('perdiooo')
       }
       return cell
     })
@@ -145,19 +148,28 @@ const Board = ({ width, height }) => {
     switch (key) {
       case RIGHT:
         // eslint-disable-next-line no-alert
-        if (head.x + 1 >= board[0].length) alert('You lost')
+        if (head.x + 1 >= board[0].length) {
+          setHasLost(true)
+        }
         break
       case LEFT:
         // eslint-disable-next-line no-alert
-        if (head.x - 1 < 0) alert('You lost')
+        if (head.x - 1 < 0) {
+          setHasLost(true)
+        }
         break
       case UP:
         // eslint-disable-next-line no-alert
-        if (head.y - 1 < 0) alert('You lost')
+        if (head.y - 1 < 0) {
+          setHasLost(true)
+        }
+
         break
       case DOWN:
         // eslint-disable-next-line no-alert
-        if (head.y + 1 >= board.length) alert('You lost')
+        if (head.y + 1 >= board.length) {
+          setHasLost(true)
+        }
         break
       default:
         break
@@ -303,6 +315,9 @@ const Board = ({ width, height }) => {
           ))}
         </div>
       ))}
+      {hasLost
+        ? <Modal />
+        : <></>}
     </div>
   )
 }
