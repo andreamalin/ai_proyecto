@@ -287,7 +287,7 @@ const Board = ({ width, height }) => {
     }
 
     if (action === -1) return
-    sleep(100).then(() => {
+    sleep(10).then(() => {
       moveSnake({
         keyCode: action,
       })
