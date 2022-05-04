@@ -20,6 +20,7 @@ const Board = ({ width, height }) => {
   const [food, setFood] = useState({ x: 0, y: 0 })
   const [lastKey, setLastKey] = useState()
   const [hasLost, setHasLost] = useState(false)
+  const [score, setScore] = useState(0)
 
   // Fill new board
   useEffect(() => {
@@ -75,6 +76,8 @@ const Board = ({ width, height }) => {
   const checkFood = (head) => {
     // If food coordinates are the same as head coordinates
     if (food.y === head.y && food.x === head.x) {
+      if (!hasLost) setScore(score + 1)
+
       // Get tail
       const tail = { ...snake[0] }
       // Add a new value at the first position of the snake (new tail)
@@ -130,9 +133,8 @@ const Board = ({ width, height }) => {
   const checkDeath = (newHead, snakeBody) => {
     snakeBody.map((cell) => {
       if (newHead.x === cell.x && newHead.y === cell.y) {
-        setHasLost(true)
         // eslint-disable-next-line no-console
-        console.log('perdiooo')
+        setHasLost(true)
       }
       return cell
     })
@@ -149,18 +151,21 @@ const Board = ({ width, height }) => {
       case RIGHT:
         // eslint-disable-next-line no-alert
         if (head.x + 1 >= board[0].length) {
+          // eslint-disable-next-line no-console
           setHasLost(true)
         }
         break
       case LEFT:
         // eslint-disable-next-line no-alert
         if (head.x - 1 < 0) {
+          // eslint-disable-next-line no-console
           setHasLost(true)
         }
         break
       case UP:
         // eslint-disable-next-line no-alert
         if (head.y - 1 < 0) {
+          // eslint-disable-next-line no-console
           setHasLost(true)
         }
 
@@ -168,6 +173,7 @@ const Board = ({ width, height }) => {
       case DOWN:
         // eslint-disable-next-line no-alert
         if (head.y + 1 >= board.length) {
+          // eslint-disable-next-line no-console
           setHasLost(true)
         }
         break
@@ -213,7 +219,6 @@ const Board = ({ width, height }) => {
     }
 
     checkDeath(head, snake) // check if snake is toching the body
-
     checkFood(head) // Check if new head is touching food
     setLastKey(key) // Save last keydown
     setSnake([...snake]) // Render DOM
@@ -247,12 +252,12 @@ const Board = ({ width, height }) => {
         break
       }
       default:
-        // eslint-disable-next-line no-alert
-        alert('stopped')
+        break
     }
   }
 
   useEffect(() => {
+    if (hasLost) return
     // New empty board
     const x = new Array(height)
 
@@ -270,7 +275,11 @@ const Board = ({ width, height }) => {
   }, [snake])
 
   useEffect(() => {
+    if (hasLost) return
     const nextMove = bfs(board, snake, food)
+    // eslint-disable-next-line no-console
+    console.log('nextMove', nextMove)
+    if (nextMove.distance === 9999) setHasLost(true)
     if (nextMove === -1) return
     const head = snake.slice(-1)[0]
     let action = -1
@@ -295,30 +304,34 @@ const Board = ({ width, height }) => {
   }, [snake])
 
   return (
-    <div className="board" onKeyDown={moveSnake} tabIndex="0">
-      {board?.map((row, rowIndex) => (
-        <div className="row" key={`row-${rowIndex}`}>
-          {row?.map((cell, cellIndex) => (
-            <>
-              {cell === 1
-                ? <div className="snake" key={`cell-${rowIndex}-${cellIndex}`} />
-                : <></>}
+    <>
+      {
+      hasLost ? <Modal width={width * 50} height={height * 50} score={score} />
+        : (
+          <div className="board" onKeyDown={moveSnake} tabIndex="0">
+            {board?.map((row, rowIndex) => (
+              <div className="row" key={`row-${rowIndex}`}>
+                {row?.map((cell, cellIndex) => (
+                  <>
+                    {cell === 1
+                      ? <div className="snake" key={`cell-${rowIndex}-${cellIndex}`} />
+                      : <></>}
 
-              {cell === 2
-                ? <div className="cell" key={`cell-${rowIndex}-${cellIndex}`}><div className="apple" /></div>
-                : <></>}
+                    {cell === 2
+                      ? <div className="cell" key={`cell-${rowIndex}-${cellIndex}`}><div className="apple" /></div>
+                      : <></>}
 
-              {cell === -1
-                ? <div className="cell" key={`cell-${rowIndex}-${cellIndex}`} />
-                : <></>}
-            </>
-          ))}
-        </div>
-      ))}
-      {hasLost
-        ? <Modal />
-        : <></>}
-    </div>
+                    {cell === -1
+                      ? <div className="cell" key={`cell-${rowIndex}-${cellIndex}`} />
+                      : <></>}
+                  </>
+                ))}
+              </div>
+            ))}
+          </div>
+        )
+    }
+    </>
   )
 }
 
