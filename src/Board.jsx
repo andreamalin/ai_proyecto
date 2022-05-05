@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable react/no-array-index-key */
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import bfs from './ai/bfs'
 import sleep from './utils/others'
@@ -256,6 +256,23 @@ const Board = ({ width, height }) => {
     }
   }
 
+  const getAction = useCallback((nextMove, head) => {
+    // Gets the move key
+    if (nextMove.x - head.x < 0) { // right
+      return LEFT
+    }
+    if (nextMove.x - head.x > 0) { // left
+      return RIGHT
+    }
+    if (nextMove.y - head.y < 0) { // up
+      return UP
+    }
+    if (nextMove.y - head.y > 0) { // down
+      return DOWN
+    }
+    return -1
+  }, [])
+
   useEffect(() => {
     if (hasLost) return
     // New empty board
@@ -276,27 +293,17 @@ const Board = ({ width, height }) => {
 
   useEffect(() => {
     if (hasLost) return
-    const nextMove = bfs(board, snake, food)
+
+    const nextMove = bfs(board, snake, food, lastKey)
     // eslint-disable-next-line no-console
-    console.log('nextMove', nextMove)
+    console.log('nextMove', nextMove, lastKey)
     if (nextMove.distance === 9999) setHasLost(true)
     if (nextMove === -1) return
     const head = snake.slice(-1)[0]
-    let action = -1
-
-    // Gets the move key
-    if (nextMove.x - head.x < 0) { // right
-      action = LEFT
-    } else if (nextMove.x - head.x > 0) { // left
-      action = RIGHT
-    } else if (nextMove.y - head.y < 0) { // up
-      action = UP
-    } else if (nextMove.y - head.y > 0) { // down
-      action = DOWN
-    }
+    const action = getAction(nextMove, head)
 
     if (action === -1) return
-    sleep(10).then(() => {
+    sleep(50).then(() => {
       moveSnake({
         keyCode: action,
       })
