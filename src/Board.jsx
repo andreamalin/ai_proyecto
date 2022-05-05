@@ -16,11 +16,14 @@ const DOWN = 40
 
 const Board = ({ width, height }) => {
   const [board, setBoard] = useState([])
-  const [snake, setSnake] = useState([])
+  const [realSnake, setRealSnake] = useState([])
+  const [snakeCopy, setSnakeCopy] = useState([])
+
   const [food, setFood] = useState({ x: 0, y: 0 })
   const [lastKey, setLastKey] = useState()
   const [hasLost, setHasLost] = useState(false)
   const [score, setScore] = useState(0)
+  const [counter, setCounter] = useState(0)
 
   // Fill new board
   useEffect(() => {
@@ -38,8 +41,36 @@ const Board = ({ width, height }) => {
 
     // Initial food values
     setFood({ x: width - 4, y: initialPos })
+    window.food = [width - 4, initialPos]
     // Initial snake coordinates
-    setSnake([
+    setRealSnake([
+      {
+        x: 2,
+        y: initialPos,
+        isHead: false,
+        direction: 'right',
+      },
+      {
+        x: 3,
+        y: initialPos,
+        isHead: false,
+        direction: 'right',
+      },
+      {
+        x: 4,
+        y: initialPos,
+        isHead: false,
+        direction: 'right',
+      },
+      {
+        x: 5,
+        y: initialPos,
+        isHead: true,
+        direction: 'right',
+      },
+    ])
+    // Initial snake coordinates
+    setSnakeCopy([
       {
         x: 2,
         y: initialPos,
@@ -73,7 +104,7 @@ const Board = ({ width, height }) => {
    * Function to check if head is on food position
    * @param head -> snake head
    */
-  const checkFood = (head) => {
+  const checkFood = (head, snake, isReal) => {
     // If food coordinates are the same as head coordinates
     if (food.y === head.y && food.x === head.x) {
       if (!hasLost) setScore(score + 1)
@@ -104,22 +135,30 @@ const Board = ({ width, height }) => {
         isHead: false,
         direction: tail.direction,
       })
-      // Set food in new coordinates
-      let isSet = false
-      while (!isSet) {
-        const xVal = Math.floor(Math.random() * board[0].length)
-        const yVal = Math.floor(Math.random() * board.length)
-        const inSnake = []
-        snake.forEach((square, index) => {
-          if (square.x === xVal && square.y === yVal) {
-            inSnake[index] = true
-          } else {
-            inSnake[index] = false
+      if (isReal) {
+        setRealSnake([...snake]) // Render DOM
+      } else {
+        setSnakeCopy([...snake]) // Render DOM
+      }
+
+      if (isReal) {
+        // Set food in new coordinates
+        let isSet = false
+        while (!isSet) {
+          const xVal = Math.floor(Math.random() * board[0].length)
+          const yVal = Math.floor(Math.random() * board.length)
+          const inSnake = []
+          snake.forEach((square, index) => {
+            if (square.x === xVal && square.y === yVal) {
+              inSnake[index] = true
+            } else {
+              inSnake[index] = false
+            }
+          })
+          if (!inSnake.includes(true)) {
+            isSet = true
+            setFood({ x: xVal, y: yVal })
           }
-        })
-        if (!inSnake.includes(true)) {
-          isSet = true
-          setFood({ x: xVal, y: yVal })
         }
       }
     }
@@ -138,7 +177,6 @@ const Board = ({ width, height }) => {
       }
       return cell
     })
-    snake.push(newHead) // Update snake with new head
   }
 
   /**
@@ -186,10 +224,11 @@ const Board = ({ width, height }) => {
    * Function to change snake current position
    * @param key -> key keyCode
    */
-  const updateSnake = (key) => {
+  const updateSnake = (key, snake, isReal) => {
     // Move all the values one position
     snake.shift()
     // The last value wont be a head anymore
+    // eslint-disable-next-line no-param-reassign
     snake[snake.length - 1].isHead = false
     // Get new head
     const head = { ...snake[snake.length - 1] }
@@ -219,35 +258,36 @@ const Board = ({ width, height }) => {
     }
 
     checkDeath(head, snake) // check if snake is toching the body
-    checkFood(head) // Check if new head is touching food
+    snake.push(head) // Update snake with new head
+
+    checkFood(head, snake, isReal) // Check if new head is touching food
     setLastKey(key) // Save last keydown
-    setSnake([...snake]) // Render DOM
   }
 
   // Movement
-  const moveSnake = (event) => {
+  const moveSnake = (event, snake, isReal = false) => {
     switch (event.keyCode) {
       case RIGHT: {
         if (lastKey !== LEFT) {
-          updateSnake(RIGHT)
+          updateSnake(RIGHT, snake, isReal)
         }
         break
       }
       case UP: {
         if (lastKey !== DOWN) {
-          updateSnake(UP)
+          updateSnake(UP, snake, isReal)
         }
         break
       }
       case LEFT: {
         if (lastKey !== RIGHT) {
-          updateSnake(LEFT)
+          updateSnake(LEFT, snake, isReal)
         }
         break
       }
       case DOWN: {
         if (lastKey !== UP) {
-          updateSnake(DOWN)
+          updateSnake(DOWN, snake, isReal)
         }
         break
       }
@@ -256,7 +296,7 @@ const Board = ({ width, height }) => {
     }
   }
 
-  useEffect(() => {
+  const updateBoard = (snake) => {
     if (hasLost) return
     // New empty board
     const x = new Array(height)
@@ -271,14 +311,14 @@ const Board = ({ width, height }) => {
 
     x[food.y][food.x] = 2 // 2->Snake
 
-    setBoard(x)
-  }, [snake])
+    // eslint-disable-next-line consistent-return
+    return x
+  }
 
-  useEffect(() => {
+  const ai = (snake) => {
     if (hasLost) return
-    const nextMove = bfs(board, snake, food)
-    // eslint-disable-next-line no-console
-    console.log('nextMove', nextMove)
+
+    const nextMove = bfs(updateBoard(snake), snake, food)
     if (nextMove.distance === 9999) setHasLost(true)
     if (nextMove === -1) return
     const head = snake.slice(-1)[0]
@@ -295,13 +335,38 @@ const Board = ({ width, height }) => {
       action = DOWN
     }
 
-    if (action === -1) return
-    sleep(10).then(() => {
-      moveSnake({
-        keyCode: action,
-      })
-    })
-  }, [snake])
+    if (action === -1) {
+      // eslint-disable-next-line no-console
+      console.log('action -1')
+      return
+    }
+
+    moveSnake({ keyCode: action }, snake)
+    // eslint-disable-next-line consistent-return
+    return action
+  }
+
+  useEffect(() => {
+    if (snakeCopy?.slice(-1)[0]) {
+      const keys = []
+      for (let i = 0; i < 100; i += 1) {
+        keys.push(ai(snakeCopy))
+        setSnakeCopy([...snakeCopy]) // Render DOM
+        if (food.y === snakeCopy.slice(-1)[0].y && food.x === snakeCopy.slice(-1)[0].x) {
+          break
+        }
+      }
+
+      for (let i = 0; i < keys.length; i += 1) {
+        // eslint-disable-next-line no-loop-func
+        sleep(20).then(() => {
+          moveSnake({ keyCode: keys[i] }, realSnake, true)
+          setRealSnake([...realSnake]) // Render DOM
+          setBoard(updateBoard(realSnake))
+        })
+      }
+    }
+  }, [food])
 
   return (
     <>
