@@ -6,7 +6,7 @@ import './index.scss'
 const App = () => (
   <>
     <h1>Snake</h1>
-    <Board width={20} height={20} />
+    <Board width={10} height={10} />
   </>
 )
 

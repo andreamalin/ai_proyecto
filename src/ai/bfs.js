@@ -29,7 +29,7 @@ const heuristic = (board, start, goal) => {
   }
 }
 
-const checkPosibleMove = (board, start, goal) => {
+const checkPosibleMove = (board, start, goal, iteration) => {
   const { x, y } = start
   const possibleMoves = []
 
@@ -38,13 +38,14 @@ const checkPosibleMove = (board, start, goal) => {
   possibleMoves.push(heuristic(board, { x: x - 1, y }, goal)) // left
   possibleMoves.push(heuristic(board, { x, y: y + 1 }, goal)) // up
   possibleMoves.push(heuristic(board, { x, y: y - 1 }, goal)) // down
-  return possibleMoves.sort((a, b) => a.distance - b.distance)[0]
+  return possibleMoves.sort((a, b) => a.distance - b.distance)[iteration]
 }
 
-const bfs = (board, snake, food) => {
+const bfs = (board, snake, food, iteration) => {
   if (!board || !board[0] || !snake || !food) { return -1 }
   const headPos = snake.slice(-1)[0]
-  return checkPosibleMove(board, headPos, food)
+
+  return checkPosibleMove(board, headPos, food, iteration)
 }
 
 export default bfs

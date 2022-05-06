@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable consistent-return */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
@@ -22,6 +24,7 @@ const Board = ({ width, height }) => {
   const [food, setFood] = useState({ x: 0, y: 0 })
   const [lastKey, setLastKey] = useState()
   const [hasLost, setHasLost] = useState(false)
+  const [copyHasLost, setCopyHasLost] = useState(false)
   const [score, setScore] = useState(0)
   const [counter, setCounter] = useState(0)
 
@@ -98,6 +101,7 @@ const Board = ({ width, height }) => {
     ])
     // Set complete board
     setBoard(x)
+    setCounter(1)
   }, [])
 
   /**
@@ -169,11 +173,16 @@ const Board = ({ width, height }) => {
    * @param newHead newHead position
    * @param snakeBody snake body position
    */
-  const checkDeath = (newHead, snakeBody) => {
+  const checkDeath = (newHead, snakeBody, isReal) => {
     snakeBody.map((cell) => {
       if (newHead.x === cell.x && newHead.y === cell.y) {
+        if (isReal) {
+          setHasLost(true)
+        } else {
         // eslint-disable-next-line no-console
-        setHasLost(true)
+          console.log('ENTRA EN HASLOST')
+          setCopyHasLost(() => true)
+        }
       }
       return cell
     })
@@ -184,35 +193,51 @@ const Board = ({ width, height }) => {
    * @param key direction pressed
    * @param head current head
    */
-  const checkBorder = (key, head) => {
+  const checkBorder = (key, head, isReal) => {
     switch (key) {
       case RIGHT:
-        // eslint-disable-next-line no-alert
         if (head.x + 1 >= board[0].length) {
-          // eslint-disable-next-line no-console
-          setHasLost(true)
+          if (isReal) {
+            setHasLost(true)
+          } else {
+            // eslint-disable-next-line no-console
+            console.log('ENTRA EN HASLOST')
+            setCopyHasLost(() => true)
+          }
         }
         break
       case LEFT:
-        // eslint-disable-next-line no-alert
         if (head.x - 1 < 0) {
-          // eslint-disable-next-line no-console
-          setHasLost(true)
+          if (isReal) {
+            setHasLost(true)
+          } else {
+            // eslint-disable-next-line no-console
+            console.log('ENTRA EN HASLOST')
+            setCopyHasLost(() => true)
+          }
         }
         break
       case UP:
-        // eslint-disable-next-line no-alert
         if (head.y - 1 < 0) {
-          // eslint-disable-next-line no-console
-          setHasLost(true)
+          if (isReal) {
+            setHasLost(true)
+          } else {
+            // eslint-disable-next-line no-console
+            console.log('ENTRA EN HASLOST')
+            setCopyHasLost(() => true)
+          }
         }
 
         break
       case DOWN:
-        // eslint-disable-next-line no-alert
         if (head.y + 1 >= board.length) {
-          // eslint-disable-next-line no-console
-          setHasLost(true)
+          if (isReal) {
+            setHasLost(true)
+          } else {
+            // eslint-disable-next-line no-console
+            console.log('ENTRA EN HASLOST')
+            setCopyHasLost(() => true)
+          }
         }
         break
       default:
@@ -234,7 +259,7 @@ const Board = ({ width, height }) => {
     const head = { ...snake[snake.length - 1] }
     head.isHead = true
 
-    checkBorder(key, head)
+    checkBorder(key, head, isReal)
     // Depending the key update coordinate of new head
     switch (key) {
       case RIGHT:
@@ -257,7 +282,7 @@ const Board = ({ width, height }) => {
         break
     }
 
-    checkDeath(head, snake) // check if snake is toching the body
+    checkDeath(head, snake, isReal) // check if snake is toching the body
     snake.push(head) // Update snake with new head
 
     checkFood(head, snake, isReal) // Check if new head is touching food
@@ -315,12 +340,12 @@ const Board = ({ width, height }) => {
     return x
   }
 
-  const ai = (snake) => {
+  const ai = (snake, current) => {
     if (hasLost) return
 
-    const nextMove = bfs(updateBoard(snake), snake, food)
-    if (nextMove.distance === 9999) setHasLost(true)
-    if (nextMove === -1) return
+    const nextMove = bfs(updateBoard(snake), snake, food, current)
+    if (!nextMove || nextMove.distance === 9999) return true
+
     const head = snake.slice(-1)[0]
     let action = -1
 
@@ -338,7 +363,8 @@ const Board = ({ width, height }) => {
     if (action === -1) {
       // eslint-disable-next-line no-console
       console.log('action -1')
-      return
+      // eslint-disable-next-line consistent-return
+      return -1
     }
 
     moveSnake({ keyCode: action }, snake)
@@ -346,27 +372,76 @@ const Board = ({ width, height }) => {
     return action
   }
 
-  useEffect(() => {
-    if (snakeCopy?.slice(-1)[0]) {
-      const keys = []
-      for (let i = 0; i < 100; i += 1) {
-        keys.push(ai(snakeCopy))
-        setSnakeCopy([...snakeCopy]) // Render DOM
-        if (food.y === snakeCopy.slice(-1)[0].y && food.x === snakeCopy.slice(-1)[0].x) {
-          break
+  useEffect(async () => {
+    const snakeCopy1 = [...snakeCopy]
+    const snakeCopy2 = [...snakeCopy]
+    const snakeCopy3 = [...snakeCopy]
+
+    if (snakeCopy?.slice(-1)[0] && !hasLost) {
+      let tryHasLost = false
+      let keys = []
+      const keys1 = []
+      const keys2 = []
+      const keys3 = []
+
+      // Realizando los 3 posibles caminos
+      for (let j = 0; j < 3; j += 1) {
+        // Revisando las siguientes 5 iteraciones
+        for (let i = 0; i < 8; i += 1) {
+          // Creando las 3 posibles copias de la serpiente
+          if (j === 0) {
+            keys1.push(ai(snakeCopy1, j))
+            if (food.y === snakeCopy1.slice(-1)[0].y && food.x === snakeCopy1.slice(-1)[0].x) {
+              break
+            }
+          }
+          if (j === 1) {
+            keys2.push(ai(snakeCopy2, j))
+            if (food.y === snakeCopy2.slice(-1)[0].y && food.x === snakeCopy2.slice(-1)[0].x) {
+              break
+            }
+          }
+          if (j === 2) {
+            keys3.push(ai(snakeCopy3, j))
+            if (food.y === snakeCopy3.slice(-1)[0].y && food.x === snakeCopy3.slice(-1)[0].x) {
+              break
+            }
+          }
         }
       }
 
-      for (let i = 0; i < keys.length; i += 1) {
-        // eslint-disable-next-line no-loop-func
-        sleep(20).then(() => {
+      /*
+       Si incluye un true significa que la serpiente muere en cierto punto,
+       por lo que elegimos la siguiente posible respuesta
+       */
+      if (!keys1.includes(true)) {
+        setSnakeCopy([...snakeCopy1])
+        keys = keys1
+      } else if (!keys2.includes(true)) {
+        setSnakeCopy([...snakeCopy2])
+        keys = keys2
+      } else if (!keys3.includes(true)) {
+        setSnakeCopy([...snakeCopy3])
+        keys = keys3
+      } else {
+        // si ninguna de las 3 sirve, la serpiente ha perdido
+        tryHasLost = true
+        setHasLost(true)
+      }
+
+      // Si no ha muerto, movemos la serpiente real
+      if (!tryHasLost) {
+        for (let i = 0; i < keys.length; i += 1) {
+          // eslint-disable-next-line no-await-in-loop
+          await sleep(30)
           moveSnake({ keyCode: keys[i] }, realSnake, true)
           setRealSnake([...realSnake]) // Render DOM
           setBoard(updateBoard(realSnake))
-        })
+        }
       }
+      if (!tryHasLost) setCounter(counter + 1)
     }
-  }, [food])
+  }, [counter])
 
   return (
     <>
