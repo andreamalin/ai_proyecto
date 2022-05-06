@@ -433,7 +433,7 @@ const Board = ({ width, height }) => {
       if (!tryHasLost) {
         for (let i = 0; i < keys.length; i += 1) {
           // eslint-disable-next-line no-await-in-loop
-          await sleep(30)
+          await sleep(15)
           moveSnake({ keyCode: keys[i] }, realSnake, true)
           setRealSnake([...realSnake]) // Render DOM
           setBoard(updateBoard(realSnake))
