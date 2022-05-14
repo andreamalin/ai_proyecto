@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable no-alert */
 /* eslint-disable consistent-return */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -105,12 +106,86 @@ const Board = ({ width, height }) => {
   }, [])
 
   /**
+   * This functions checks in all directions to find the concentration of snake
+   * @param head -> Snake Head
+   */
+  const checkSnakeDispersion = (head) => {
+    const snakeHeadX = head.x
+    const snakeHeadY = head.y
+
+    /* Conseguir proporcion de cantidad de serpiente y espacios libres,
+    vertical, horizontal y en cuadrantes. */
+    /* On tuple, x = snake, y = board */
+    const above = [0, 0]
+    const below = [0, 0]
+    const right = [0, 0]
+    const left = [0, 0]
+    const upRight = [0, 0]
+    const upLeft = [0, 0]
+    const downRight = [0, 0]
+    const downLeft = [0, 0]
+    board.forEach((row, rowIndex) => {
+      row.forEach((cell, columnIndex) => {
+        if (rowIndex < snakeHeadY) {
+          if (cell === 1) {
+            above[0] += 1
+          } else {
+            above[1] += 1
+          }
+          if (columnIndex < snakeHeadX) {
+            if (cell === 1) {
+              left[0] += 1
+              upLeft[0] += 1
+            } else {
+              left[1] += 1
+              upLeft[1] += 1
+            }
+          } else if (columnIndex > snakeHeadX) {
+            if (cell === 1) {
+              right[0] += 1
+              upRight[0] += 1
+            } else {
+              right[1] += 1
+              upRight[1] += 1
+            }
+          }
+        } else if (rowIndex > snakeHeadY) {
+          if (cell === 1) {
+            below[0] += 1
+          } else {
+            below[1] += 1
+          }
+          if (columnIndex < snakeHeadX) {
+            if (cell === 1) {
+              left[0] += 1
+              downLeft[0] += 1
+            } else {
+              left[1] += 1
+              downLeft[1] += 1
+            }
+          } else if (columnIndex > snakeHeadX) {
+            if (cell === 1) {
+              right[0] += 1
+              downRight[0] += 1
+            } else {
+              right[1] += 1
+              downRight[1] += 1
+            }
+          }
+        }
+      })
+    })
+    console.log('hi')
+  }
+
+  /**
    * Function to check if head is on food position
    * @param head -> snake head
    */
   const checkFood = (head, snake, isReal) => {
     // If food coordinates are the same as head coordinates
     if (food.y === head.y && food.x === head.x) {
+      checkSnakeDispersion(head)
       if (!hasLost) setScore(score + 1)
 
       // Get tail
@@ -317,6 +392,7 @@ const Board = ({ width, height }) => {
         break
       }
       default:
+        alert('stop')
         break
     }
   }
