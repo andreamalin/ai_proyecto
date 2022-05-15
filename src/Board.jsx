@@ -109,83 +109,92 @@ const Board = ({ width, height }) => {
    * This functions checks in all directions to find the concentration of snake
    * @param head -> Snake Head
    */
-  const checkSnakeDispersion = (head) => {
-    const snakeHeadX = head.x
-    const snakeHeadY = head.y
+  const checkSnakeDispersion = (head, ai) => {
+    if (!ai) {
+      const snakeHeadX = head.x
+      const snakeHeadY = head.y
 
-    /* Conseguir proporcion de cantidad de serpiente y espacios libres,
-    vertical, horizontal y en cuadrantes. */
-    /* On tuple, x = snake, y = board */
-    const above = [0, 0]
-    const below = [0, 0]
-    const right = [0, 0]
-    const left = [0, 0]
-    const upRight = [0, 0]
-    const upLeft = [0, 0]
-    const downRight = [0, 0]
-    const downLeft = [0, 0]
-    board.forEach((row, rowIndex) => {
-      row.forEach((cell, columnIndex) => {
-        if (rowIndex < snakeHeadY) {
-          if (cell === 1) {
-            above[0] += 1
-          } else {
-            above[1] += 1
-          }
-          if (columnIndex < snakeHeadX) {
+      /* Conseguir proporcion de cantidad de serpiente y espacios libres,
+      vertical, horizontal y en cuadrantes. */
+      /* On tuple, x = snake, y = board */
+      const above = [0, 0, 0]
+      const below = [0, 0, 0]
+      const right = [0, 0, 0]
+      const left = [0, 0, 0]
+      const upRight = [0, 0, 0]
+      const upLeft = [0, 0, 0]
+      const downRight = [0, 0, 0]
+      const downLeft = [0, 0, 0]
+      board.forEach((row, rowIndex) => {
+        row.forEach((cell, columnIndex) => {
+          if (rowIndex < snakeHeadY) {
             if (cell === 1) {
-              left[0] += 1
-              upLeft[0] += 1
+              above[0] += 1
             } else {
-              left[1] += 1
-              upLeft[1] += 1
+              above[1] += 1
             }
-          } else if (columnIndex > snakeHeadX) {
+            if (columnIndex < snakeHeadX) {
+              if (cell === 1) {
+                left[0] += 1
+                upLeft[0] += 1
+              } else {
+                left[1] += 1
+                upLeft[1] += 1
+              }
+            } else if (columnIndex > snakeHeadX) {
+              if (cell === 1) {
+                right[0] += 1
+                upRight[0] += 1
+              } else {
+                right[1] += 1
+                upRight[1] += 1
+              }
+            }
+          } else if (rowIndex > snakeHeadY) {
             if (cell === 1) {
-              right[0] += 1
-              upRight[0] += 1
+              below[0] += 1
             } else {
-              right[1] += 1
-              upRight[1] += 1
+              below[1] += 1
+            }
+            if (columnIndex < snakeHeadX) {
+              if (cell === 1) {
+                left[0] += 1
+                downLeft[0] += 1
+              } else {
+                left[1] += 1
+                downLeft[1] += 1
+              }
+            } else if (columnIndex > snakeHeadX) {
+              if (cell === 1) {
+                right[0] += 1
+                downRight[0] += 1
+              } else {
+                right[1] += 1
+                downRight[1] += 1
+              }
             }
           }
-        } else if (rowIndex > snakeHeadY) {
-          if (cell === 1) {
-            below[0] += 1
-          } else {
-            below[1] += 1
-          }
-          if (columnIndex < snakeHeadX) {
-            if (cell === 1) {
-              left[0] += 1
-              downLeft[0] += 1
-            } else {
-              left[1] += 1
-              downLeft[1] += 1
-            }
-          } else if (columnIndex > snakeHeadX) {
-            if (cell === 1) {
-              right[0] += 1
-              downRight[0] += 1
-            } else {
-              right[1] += 1
-              downRight[1] += 1
-            }
-          }
-        }
+        })
       })
-    })
-    console.log('hi')
+      above[2] = 3 * above[1] - 1.5 * above[0]
+      below[2] = 3 * below[1] - 1.5 * below[0]
+      right[2] = 3 * right[1] - 1.5 * right[0]
+      left[2] = 3 * left[1] - 1.5 * left[0]
+      upRight[2] = 3 * upRight[1] - 1.5 * upRight[0]
+      upLeft[2] = 3 * upLeft[1] - 1.5 * upLeft[0]
+      downRight[2] = 3 * downRight[1] - 1.5 * downRight[0]
+      downLeft[2] = 3 * downLeft[1] - 1.5 * downLeft[0]
+    }
   }
 
   /**
    * Function to check if head is on food position
    * @param head -> snake head
    */
-  const checkFood = (head, snake, isReal) => {
+  const checkFood = (head, snake, isReal, ai) => {
     // If food coordinates are the same as head coordinates
     if (food.y === head.y && food.x === head.x) {
-      checkSnakeDispersion(head)
+      checkSnakeDispersion(head, ai)
       if (!hasLost) setScore(score + 1)
 
       // Get tail
@@ -324,7 +333,7 @@ const Board = ({ width, height }) => {
    * Function to change snake current position
    * @param key -> key keyCode
    */
-  const updateSnake = (key, snake, isReal) => {
+  const updateSnake = (key, snake, isReal, ai) => {
     // Move all the values one position
     snake.shift()
     // The last value wont be a head anymore
@@ -360,34 +369,34 @@ const Board = ({ width, height }) => {
     checkDeath(head, snake, isReal) // check if snake is toching the body
     snake.push(head) // Update snake with new head
 
-    checkFood(head, snake, isReal) // Check if new head is touching food
+    checkFood(head, snake, isReal, ai) // Check if new head is touching food
     setLastKey(key) // Save last keydown
   }
 
   // Movement
-  const moveSnake = (event, snake, isReal = false) => {
+  const moveSnake = (event, snake, isReal = false, ai = false) => {
     switch (event.keyCode) {
       case RIGHT: {
         if (lastKey !== LEFT) {
-          updateSnake(RIGHT, snake, isReal)
+          updateSnake(RIGHT, snake, isReal, ai)
         }
         break
       }
       case UP: {
         if (lastKey !== DOWN) {
-          updateSnake(UP, snake, isReal)
+          updateSnake(UP, snake, isReal, ai)
         }
         break
       }
       case LEFT: {
         if (lastKey !== RIGHT) {
-          updateSnake(LEFT, snake, isReal)
+          updateSnake(LEFT, snake, isReal, ai)
         }
         break
       }
       case DOWN: {
         if (lastKey !== UP) {
-          updateSnake(DOWN, snake, isReal)
+          updateSnake(DOWN, snake, isReal, ai)
         }
         break
       }
@@ -443,7 +452,7 @@ const Board = ({ width, height }) => {
       return -1
     }
 
-    moveSnake({ keyCode: action }, snake)
+    moveSnake({ keyCode: action }, snake, false, true)
     // eslint-disable-next-line consistent-return
     return action
   }
