@@ -25,7 +25,6 @@ const Board = ({ width, height }) => {
   const [food, setFood] = useState({ x: 0, y: 0 })
   const [lastKey, setLastKey] = useState()
   const [hasLost, setHasLost] = useState(false)
-  const [copyHasLost, setCopyHasLost] = useState(false)
   const [score, setScore] = useState(0)
   const [counter, setCounter] = useState(0)
 
@@ -106,95 +105,12 @@ const Board = ({ width, height }) => {
   }, [])
 
   /**
-   * This functions checks in all directions to find the concentration of snake
-   * @param head -> Snake Head
-   */
-  const checkSnakeDispersion = (head, ai) => {
-    if (!ai) {
-      const snakeHeadX = head.x
-      const snakeHeadY = head.y
-
-      /* Conseguir proporcion de cantidad de serpiente y espacios libres,
-      vertical, horizontal y en cuadrantes. */
-      /* On tuple, x = snake, y = board */
-      const above = [0, 0, 0]
-      const below = [0, 0, 0]
-      const right = [0, 0, 0]
-      const left = [0, 0, 0]
-      const upRight = [0, 0, 0]
-      const upLeft = [0, 0, 0]
-      const downRight = [0, 0, 0]
-      const downLeft = [0, 0, 0]
-      board.forEach((row, rowIndex) => {
-        row.forEach((cell, columnIndex) => {
-          if (rowIndex < snakeHeadY) {
-            if (cell === 1) {
-              above[0] += 1
-            } else {
-              above[1] += 1
-            }
-            if (columnIndex < snakeHeadX) {
-              if (cell === 1) {
-                left[0] += 1
-                upLeft[0] += 1
-              } else {
-                left[1] += 1
-                upLeft[1] += 1
-              }
-            } else if (columnIndex > snakeHeadX) {
-              if (cell === 1) {
-                right[0] += 1
-                upRight[0] += 1
-              } else {
-                right[1] += 1
-                upRight[1] += 1
-              }
-            }
-          } else if (rowIndex > snakeHeadY) {
-            if (cell === 1) {
-              below[0] += 1
-            } else {
-              below[1] += 1
-            }
-            if (columnIndex < snakeHeadX) {
-              if (cell === 1) {
-                left[0] += 1
-                downLeft[0] += 1
-              } else {
-                left[1] += 1
-                downLeft[1] += 1
-              }
-            } else if (columnIndex > snakeHeadX) {
-              if (cell === 1) {
-                right[0] += 1
-                downRight[0] += 1
-              } else {
-                right[1] += 1
-                downRight[1] += 1
-              }
-            }
-          }
-        })
-      })
-      above[2] = 3 * above[1] - 1.5 * above[0]
-      below[2] = 3 * below[1] - 1.5 * below[0]
-      right[2] = 3 * right[1] - 1.5 * right[0]
-      left[2] = 3 * left[1] - 1.5 * left[0]
-      upRight[2] = 3 * upRight[1] - 1.5 * upRight[0]
-      upLeft[2] = 3 * upLeft[1] - 1.5 * upLeft[0]
-      downRight[2] = 3 * downRight[1] - 1.5 * downRight[0]
-      downLeft[2] = 3 * downLeft[1] - 1.5 * downLeft[0]
-    }
-  }
-
-  /**
    * Function to check if head is on food position
    * @param head -> snake head
    */
-  const checkFood = (head, snake, isReal, ai) => {
+  const checkFood = (head, snake, isReal) => {
     // If food coordinates are the same as head coordinates
     if (food.y === head.y && food.x === head.x) {
-      checkSnakeDispersion(head, ai)
       if (!hasLost) setScore(score + 1)
 
       // Get tail
@@ -262,10 +178,6 @@ const Board = ({ width, height }) => {
       if (newHead.x === cell.x && newHead.y === cell.y) {
         if (isReal) {
           setHasLost(true)
-        } else {
-        // eslint-disable-next-line no-console
-          console.log('ENTRA EN HASLOST')
-          setCopyHasLost(() => true)
         }
       }
       return cell
@@ -283,10 +195,6 @@ const Board = ({ width, height }) => {
         if (head.x + 1 >= board[0].length) {
           if (isReal) {
             setHasLost(true)
-          } else {
-            // eslint-disable-next-line no-console
-            console.log('ENTRA EN HASLOST')
-            setCopyHasLost(() => true)
           }
         }
         break
@@ -294,10 +202,6 @@ const Board = ({ width, height }) => {
         if (head.x - 1 < 0) {
           if (isReal) {
             setHasLost(true)
-          } else {
-            // eslint-disable-next-line no-console
-            console.log('ENTRA EN HASLOST')
-            setCopyHasLost(() => true)
           }
         }
         break
@@ -305,10 +209,6 @@ const Board = ({ width, height }) => {
         if (head.y - 1 < 0) {
           if (isReal) {
             setHasLost(true)
-          } else {
-            // eslint-disable-next-line no-console
-            console.log('ENTRA EN HASLOST')
-            setCopyHasLost(() => true)
           }
         }
 
@@ -317,10 +217,6 @@ const Board = ({ width, height }) => {
         if (head.y + 1 >= board.length) {
           if (isReal) {
             setHasLost(true)
-          } else {
-            // eslint-disable-next-line no-console
-            console.log('ENTRA EN HASLOST')
-            setCopyHasLost(() => true)
           }
         }
         break
@@ -333,7 +229,7 @@ const Board = ({ width, height }) => {
    * Function to change snake current position
    * @param key -> key keyCode
    */
-  const updateSnake = (key, snake, isReal, ai) => {
+  const updateSnake = (key, snake, isReal) => {
     // Move all the values one position
     snake.shift()
     // The last value wont be a head anymore
@@ -369,34 +265,34 @@ const Board = ({ width, height }) => {
     checkDeath(head, snake, isReal) // check if snake is toching the body
     snake.push(head) // Update snake with new head
 
-    checkFood(head, snake, isReal, ai) // Check if new head is touching food
+    checkFood(head, snake, isReal) // Check if new head is touching food
     setLastKey(key) // Save last keydown
   }
 
   // Movement
-  const moveSnake = (event, snake, isReal = false, ai = false) => {
+  const moveSnake = (event, snake, isReal = false) => {
     switch (event.keyCode) {
       case RIGHT: {
         if (lastKey !== LEFT) {
-          updateSnake(RIGHT, snake, isReal, ai)
+          updateSnake(RIGHT, snake, isReal)
         }
         break
       }
       case UP: {
         if (lastKey !== DOWN) {
-          updateSnake(UP, snake, isReal, ai)
+          updateSnake(UP, snake, isReal)
         }
         break
       }
       case LEFT: {
         if (lastKey !== RIGHT) {
-          updateSnake(LEFT, snake, isReal, ai)
+          updateSnake(LEFT, snake, isReal)
         }
         break
       }
       case DOWN: {
         if (lastKey !== UP) {
-          updateSnake(DOWN, snake, isReal, ai)
+          updateSnake(DOWN, snake, isReal)
         }
         break
       }
@@ -423,6 +319,100 @@ const Board = ({ width, height }) => {
 
     // eslint-disable-next-line consistent-return
     return x
+  }
+
+  /**
+   * This functions checks in all directions to find the concentration of snake
+   * @param head -> Snake Head
+   */
+  const checkSnakeDispersion = (snakeToCheck, keys) => {
+    const copyBoard = updateBoard(snakeToCheck)
+    const copyHead = snakeToCheck.slice(-1)[0]
+
+    const snakeHeadX = copyHead.x
+    const snakeHeadY = copyHead.y
+
+    /* Conseguir proporcion de cantidad de serpiente y espacios libres,
+      vertical, horizontal y en cuadrantes. */
+    /* On tuple, x = snake, y = board */
+    const above = [0, 0, 0]
+    const below = [0, 0, 0]
+    const right = [0, 0, 0]
+    const left = [0, 0, 0]
+    const upRight = [0, 0, 0]
+    const upLeft = [0, 0, 0]
+    const downRight = [0, 0, 0]
+    const downLeft = [0, 0, 0]
+    copyBoard.forEach((row, rowIndex) => {
+      row.forEach((cell, columnIndex) => {
+        if (rowIndex < snakeHeadY) {
+          if (cell === 1) {
+            above[0] += 1
+          } else {
+            above[1] += 1
+          }
+          if (columnIndex < snakeHeadX) {
+            if (cell === 1) {
+              left[0] += 1
+              upLeft[0] += 1
+            } else {
+              left[1] += 1
+              upLeft[1] += 1
+            }
+          } else if (columnIndex > snakeHeadX) {
+            if (cell === 1) {
+              right[0] += 1
+              upRight[0] += 1
+            } else {
+              right[1] += 1
+              upRight[1] += 1
+            }
+          }
+        } else if (rowIndex > snakeHeadY) {
+          if (cell === 1) {
+            below[0] += 1
+          } else {
+            below[1] += 1
+          }
+          if (columnIndex < snakeHeadX) {
+            if (cell === 1) {
+              left[0] += 1
+              downLeft[0] += 1
+            } else {
+              left[1] += 1
+              downLeft[1] += 1
+            }
+          } else if (columnIndex > snakeHeadX) {
+            if (cell === 1) {
+              right[0] += 1
+              downRight[0] += 1
+            } else {
+              right[1] += 1
+              downRight[1] += 1
+            }
+          }
+        }
+      })
+    })
+    above[2] = 3 * above[1] - 1.5 * above[0]
+    below[2] = 3 * below[1] - 1.5 * below[0]
+    right[2] = 3 * right[1] - 1.5 * right[0]
+    left[2] = 3 * left[1] - 1.5 * left[0]
+    upRight[2] = 3 * upRight[1] - 1.5 * upRight[0]
+    upLeft[2] = 3 * upLeft[1] - 1.5 * upLeft[0]
+    downRight[2] = 3 * downRight[1] - 1.5 * downRight[0]
+    downLeft[2] = 3 * downLeft[1] - 1.5 * downLeft[0]
+
+    // retornando la prioridad de la primera tecla a ejecutar
+    if (keys[0] === UP) {
+      return above[2]
+    } if (keys[0] === DOWN) {
+      return below[2]
+    } if (keys[0] === LEFT) {
+      return left[2]
+    } if (keys[0] === RIGHT) {
+      return right[2]
+    }
   }
 
   const ai = (snake, current) => {
@@ -452,7 +442,7 @@ const Board = ({ width, height }) => {
       return -1
     }
 
-    moveSnake({ keyCode: action }, snake, false, true)
+    moveSnake({ keyCode: action }, snake, false)
     // eslint-disable-next-line consistent-return
     return action
   }
@@ -499,19 +489,44 @@ const Board = ({ width, height }) => {
        Si incluye un true significa que la serpiente muere en cierto punto,
        por lo que elegimos la siguiente posible respuesta
        */
+      const possibleKeys = []
       if (!keys1.includes(true)) {
-        setSnakeCopy([...snakeCopy1])
-        keys = keys1
-      } else if (!keys2.includes(true)) {
-        setSnakeCopy([...snakeCopy2])
-        keys = keys2
-      } else if (!keys3.includes(true)) {
-        setSnakeCopy([...snakeCopy3])
-        keys = keys3
-      } else {
+        console.log('keys1', keys1)
+        possibleKeys.push({
+          snake: snakeCopy1,
+          keys: keys1,
+          score: checkSnakeDispersion(snakeCopy1, keys1),
+        })
+      }
+      if (!keys2.includes(true)) {
+        console.log('keys2', keys2)
+        possibleKeys.push({
+          snake: snakeCopy2,
+          keys: keys2,
+          score: checkSnakeDispersion(snakeCopy2, keys2),
+        })
+      }
+      if (!keys3.includes(true)) {
+        console.log('keys3', keys3)
+        possibleKeys.push({
+          snake: snakeCopy3,
+          keys: keys3,
+          score: checkSnakeDispersion(snakeCopy3, keys3),
+        })
+      }
+
+      if (possibleKeys.length === 0) {
         // si ninguna de las 3 sirve, la serpiente ha perdido
         tryHasLost = true
         setHasLost(true)
+      } else {
+        // obtener el path donde la primera tecla tenga el mejor score
+        const higherValue = possibleKeys.reduce(
+          (prev, current) => ((prev.score > current.score) ? prev : current), 1,
+        )
+        setSnakeCopy([...higherValue.snake])
+        keys = higherValue.keys
+        console.log('keys', keys)
       }
 
       // Si no ha muerto, movemos la serpiente real
