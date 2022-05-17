@@ -1,11 +1,13 @@
+/* eslint-disable import/extensions */
+/* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable react/no-array-index-key */
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import bfs from './ai/bfs'
 import sleep from './utils/others'
+import { getPath, getMove } from './ai/hamiltonian.js'
 import Modal from './modal'
 import './index.scss'
 
@@ -20,6 +22,7 @@ const Board = ({ width, height }) => {
   const [food, setFood] = useState({ x: 0, y: 0 })
   const [lastKey, setLastKey] = useState()
   const [hasLost, setHasLost] = useState(false)
+  const [path, setPath] = useState([])
   const [score, setScore] = useState(0)
 
   // Fill new board
@@ -31,7 +34,7 @@ const Board = ({ width, height }) => {
     }
 
     // Initial pos will be the center of the board
-    const initialPos = Math.ceil(height / 2)
+    const initialPos = 1
 
     x[initialPos].fill(1, 2, 6) // 1->Snake
     x[initialPos][width - 4] = 2 // 2->Apple
@@ -275,12 +278,15 @@ const Board = ({ width, height }) => {
   }, [snake])
 
   useEffect(() => {
+    if ((path !== -1) && (path.length !== 0 || !board)) return
+    setPath(getPath(board))
+  }, [board])
+
+  useEffect(() => {
     if (hasLost) return
-    const nextMove = bfs(board, snake, food)
-    // eslint-disable-next-line no-console
-    console.log('nextMove', nextMove)
-    if (nextMove.distance === 9999) setHasLost(true)
-    if (nextMove === -1) return
+    const nextMove = getMove(path, snake)
+
+    if (!nextMove || nextMove === -1) return
     const head = snake.slice(-1)[0]
     let action = -1
 
@@ -301,7 +307,7 @@ const Board = ({ width, height }) => {
         keyCode: action,
       })
     })
-  }, [snake])
+  }, [snake, path])
 
   return (
     <>
