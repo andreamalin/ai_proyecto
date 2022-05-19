@@ -339,56 +339,62 @@ const Board = ({ width, height }) => {
     const below = [0, 0, 0]
     const right = [0, 0, 0]
     const left = [0, 0, 0]
-    const upRight = [0, 0, 0]
-    const upLeft = [0, 0, 0]
-    const downRight = [0, 0, 0]
-    const downLeft = [0, 0, 0]
     copyBoard.forEach((row, rowIndex) => {
       row.forEach((cell, columnIndex) => {
         if (rowIndex < snakeHeadY) {
           if (cell === 1) {
             above[0] += 1
           } else {
+            if (cell === 2) {
+              above[1] *= 100
+            }
             above[1] += 1
           }
           if (columnIndex < snakeHeadX) {
             if (cell === 1) {
               left[0] += 1
-              upLeft[0] += 1
             } else {
+              if (cell === 2) {
+                left[1] *= 100
+              }
               left[1] += 1
-              upLeft[1] += 1
             }
           } else if (columnIndex > snakeHeadX) {
             if (cell === 1) {
               right[0] += 1
-              upRight[0] += 1
             } else {
+              if (cell === 2) {
+                right[1] *= 100
+              }
               right[1] += 1
-              upRight[1] += 1
             }
           }
         } else if (rowIndex > snakeHeadY) {
           if (cell === 1) {
             below[0] += 1
           } else {
+            if (cell === 2) {
+              below[1] *= 100
+            }
             below[1] += 1
           }
           if (columnIndex < snakeHeadX) {
             if (cell === 1) {
               left[0] += 1
-              downLeft[0] += 1
             } else {
+              if (cell === 2) {
+                left[1] *= 100
+              }
               left[1] += 1
-              downLeft[1] += 1
             }
           } else if (columnIndex > snakeHeadX) {
             if (cell === 1) {
               right[0] += 1
-              downRight[0] += 1
             } else {
+              if (cell === 2) {
+                right[1] *= 100
+              }
               right[1] += 1
-              downRight[1] += 1
             }
           }
         }
@@ -398,11 +404,11 @@ const Board = ({ width, height }) => {
     below[2] = 3 * below[1] - 1.5 * below[0]
     right[2] = 3 * right[1] - 1.5 * right[0]
     left[2] = 3 * left[1] - 1.5 * left[0]
-    upRight[2] = 3 * upRight[1] - 1.5 * upRight[0]
-    upLeft[2] = 3 * upLeft[1] - 1.5 * upLeft[0]
-    downRight[2] = 3 * downRight[1] - 1.5 * downRight[0]
-    downLeft[2] = 3 * downLeft[1] - 1.5 * downLeft[0]
 
+    console.log('above', above[2])
+    console.log('below', below[2])
+    console.log('right', right[2])
+    console.log('left', left[2])
     // retornando la prioridad de la primera tecla a ejecutar
     if (keys[0] === UP) {
       return above[2]
@@ -515,6 +521,8 @@ const Board = ({ width, height }) => {
         })
       }
 
+      console.log(possibleKeys)
+
       if (possibleKeys.length === 0) {
         // si ninguna de las 3 sirve, la serpiente ha perdido
         tryHasLost = true
@@ -524,9 +532,10 @@ const Board = ({ width, height }) => {
         const higherValue = possibleKeys.reduce(
           (prev, current) => ((prev.score > current.score) ? prev : current), 1,
         )
+        console.log('higherValue', higherValue.score)
         setSnakeCopy([...higherValue.snake])
         keys = higherValue.keys
-        console.log('keys', keys)
+        // console.log('keys', keys)
       }
 
       // Si no ha muerto, movemos la serpiente real
