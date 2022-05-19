@@ -343,56 +343,56 @@ const Board = ({ width, height }) => {
       row.forEach((cell, columnIndex) => {
         if (rowIndex < snakeHeadY) {
           if (cell === 1) {
-            above[0] += 1
+            above[0] += Math.abs(snakeHeadY - rowIndex)
           } else {
             if (cell === 2) {
-              above[1] *= 100
+              above[1] += 20
             }
             above[1] += 1
           }
           if (columnIndex < snakeHeadX) {
             if (cell === 1) {
-              left[0] += 1
+              left[0] += Math.abs(snakeHeadX - columnIndex)
             } else {
               if (cell === 2) {
-                left[1] *= 100
+                left[1] += 20
               }
               left[1] += 1
             }
           } else if (columnIndex > snakeHeadX) {
             if (cell === 1) {
-              right[0] += 1
+              right[0] += Math.abs(snakeHeadX - columnIndex)
             } else {
               if (cell === 2) {
-                right[1] *= 100
+                right[1] += 20
               }
               right[1] += 1
             }
           }
         } else if (rowIndex > snakeHeadY) {
           if (cell === 1) {
-            below[0] += 1
+            below[0] += Math.abs(snakeHeadY - rowIndex)
           } else {
             if (cell === 2) {
-              below[1] *= 100
+              below[1] += 20
             }
             below[1] += 1
           }
           if (columnIndex < snakeHeadX) {
             if (cell === 1) {
-              left[0] += 1
+              left[0] += Math.abs(snakeHeadX - columnIndex)
             } else {
               if (cell === 2) {
-                left[1] *= 100
+                left[1] += 20
               }
               left[1] += 1
             }
           } else if (columnIndex > snakeHeadX) {
             if (cell === 1) {
-              right[0] += 1
+              right[0] += Math.abs(snakeHeadX - columnIndex)
             } else {
               if (cell === 2) {
-                right[1] *= 100
+                right[1] += 20
               }
               right[1] += 1
             }
@@ -400,10 +400,10 @@ const Board = ({ width, height }) => {
         }
       })
     })
-    above[2] = 3 * above[1] - 1.5 * above[0]
-    below[2] = 3 * below[1] - 1.5 * below[0]
-    right[2] = 3 * right[1] - 1.5 * right[0]
-    left[2] = 3 * left[1] - 1.5 * left[0]
+    above[2] = 3 * above[1] - 2.5 * above[0]
+    below[2] = 3 * below[1] - 2.5 * below[0]
+    right[2] = 3 * right[1] - 2.5 * right[0]
+    left[2] = 3 * left[1] - 2.5 * left[0]
 
     console.log('above', above[2])
     console.log('below', below[2])
