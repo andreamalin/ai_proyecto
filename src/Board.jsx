@@ -343,7 +343,7 @@ const Board = ({ width, height }) => {
       row.forEach((cell, columnIndex) => {
         if (rowIndex < snakeHeadY) {
           if (cell === 1) {
-            above[0] += Math.abs(snakeHeadY - rowIndex)
+            above[0] += 20 / Math.abs(snakeHeadY - rowIndex)
           } else {
             if (cell === 2) {
               above[1] += 20
@@ -352,7 +352,7 @@ const Board = ({ width, height }) => {
           }
           if (columnIndex < snakeHeadX) {
             if (cell === 1) {
-              left[0] += Math.abs(snakeHeadX - columnIndex)
+              left[0] += 20 / Math.abs(snakeHeadX - columnIndex)
             } else {
               if (cell === 2) {
                 left[1] += 20
@@ -361,7 +361,7 @@ const Board = ({ width, height }) => {
             }
           } else if (columnIndex > snakeHeadX) {
             if (cell === 1) {
-              right[0] += Math.abs(snakeHeadX - columnIndex)
+              right[0] += 20 / Math.abs(snakeHeadX - columnIndex)
             } else {
               if (cell === 2) {
                 right[1] += 20
@@ -371,7 +371,7 @@ const Board = ({ width, height }) => {
           }
         } else if (rowIndex > snakeHeadY) {
           if (cell === 1) {
-            below[0] += Math.abs(snakeHeadY - rowIndex)
+            below[0] += 20 / Math.abs(snakeHeadY - rowIndex)
           } else {
             if (cell === 2) {
               below[1] += 20
@@ -380,7 +380,7 @@ const Board = ({ width, height }) => {
           }
           if (columnIndex < snakeHeadX) {
             if (cell === 1) {
-              left[0] += Math.abs(snakeHeadX - columnIndex)
+              left[0] += 20 / Math.abs(snakeHeadX - columnIndex)
             } else {
               if (cell === 2) {
                 left[1] += 20
@@ -389,7 +389,7 @@ const Board = ({ width, height }) => {
             }
           } else if (columnIndex > snakeHeadX) {
             if (cell === 1) {
-              right[0] += Math.abs(snakeHeadX - columnIndex)
+              right[0] += 20 / Math.abs(snakeHeadX - columnIndex)
             } else {
               if (cell === 2) {
                 right[1] += 20
