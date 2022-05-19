@@ -528,14 +528,24 @@ const Board = ({ width, height }) => {
         tryHasLost = true
         setHasLost(true)
       } else {
-        // obtener el path donde la primera tecla tenga el mejor score
-        const higherValue = possibleKeys.reduce(
-          (prev, current) => ((prev.score > current.score) ? prev : current), 1,
-        )
-        console.log('higherValue', higherValue.score)
-        setSnakeCopy([...higherValue.snake])
-        keys = higherValue.keys
-        // console.log('keys', keys)
+        for (let k = 0; k < possibleKeys.length; k += 1) {
+          if (possibleKeys[k].keys.length < 8) {
+            console.log('ENTRA EN MENOS DE 8 KEYS', possibleKeys[k].keys)
+            setSnakeCopy([...possibleKeys[k].snake])
+            keys = possibleKeys[k].keys
+            break
+          }
+        }
+        if (keys.length === 0) {
+          // obtener el path donde la primera tecla tenga el mejor score
+          const higherValue = possibleKeys.reduce(
+            (prev, current) => ((prev.score > current.score) ? prev : current), 1,
+          )
+          console.log('higherValue', higherValue.score)
+          setSnakeCopy([...higherValue.snake])
+          keys = higherValue.keys
+          // console.log('keys', keys)
+        }
       }
 
       // Si no ha muerto, movemos la serpiente real
