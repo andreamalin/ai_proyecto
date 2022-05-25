@@ -27,6 +27,7 @@ const Board = ({ width, height }) => {
   const [hasLost, setHasLost] = useState(false)
   const [score, setScore] = useState(0)
   const [counter, setCounter] = useState(0)
+  console.time('startTiming')
 
   // Fill new board
   useEffect(() => {
@@ -177,6 +178,7 @@ const Board = ({ width, height }) => {
     snakeBody.map((cell) => {
       if (newHead.x === cell.x && newHead.y === cell.y) {
         if (isReal) {
+          console.timeEnd('startTiming')
           setHasLost(true)
         }
       }
@@ -194,6 +196,7 @@ const Board = ({ width, height }) => {
       case RIGHT:
         if (head.x + 1 >= board[0].length) {
           if (isReal) {
+            console.timeEnd('startTiming')
             setHasLost(true)
           }
         }
@@ -201,6 +204,7 @@ const Board = ({ width, height }) => {
       case LEFT:
         if (head.x - 1 < 0) {
           if (isReal) {
+            console.timeEnd('startTiming')
             setHasLost(true)
           }
         }
@@ -208,6 +212,7 @@ const Board = ({ width, height }) => {
       case UP:
         if (head.y - 1 < 0) {
           if (isReal) {
+            console.timeEnd('startTiming')
             setHasLost(true)
           }
         }
@@ -216,6 +221,7 @@ const Board = ({ width, height }) => {
       case DOWN:
         if (head.y + 1 >= board.length) {
           if (isReal) {
+            console.timeEnd('startTiming')
             setHasLost(true)
           }
         }
@@ -526,6 +532,8 @@ const Board = ({ width, height }) => {
       if (possibleKeys.length === 0) {
         // si ninguna de las 3 sirve, la serpiente ha perdido
         tryHasLost = true
+
+        console.timeEnd('startTiming')
         setHasLost(true)
       } else {
         for (let k = 0; k < possibleKeys.length; k += 1) {
